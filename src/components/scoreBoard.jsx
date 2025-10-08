@@ -1,13 +1,15 @@
-export default function ScoreBoard() {
-   
-    return (
-        <div className="score-board">
-            <h3 className="score-board-title">
-                Score
-            </h3>
-            <p className="score-board-counter">
-                4-3
-            </p>
-        </div>
-    );
+export default function ScoreBoard({ currentScore, bestScore }) {
+  return (
+    
+    <div className="score-board">
+      <div className="current-score">
+        <span className="current-score-title">Score :</span>
+        <span className="current-score-number">{currentScore}</span>
+      </div>
+      <div className="best-score">
+        <span className="best-score-title">Besr score:</span>
+        <span className="best-score-numbber">{bestScore}</span>
+      </div>
+    </div>
+  );
 }
