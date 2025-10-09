@@ -9,12 +9,20 @@ import { useState } from "react";
 
 function App() {
   //const [count, setCount] = useState(0);
-  const [isFlipped, setIsFlipped] = useState('');
-  const [pokemon, setPokemon] = useState('');
-  const [onCardClick, setOnCardClick] = useState('');
+  const [isFlipped, setIsFlipped] = useState("");
+  const [pokemon, setPokemon] = useState("");
+  const [onCardClick, setOnCardClick] = useState("");
   const [currentScore, setCurrentScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
-  
+
+  const shuffleCards = (array) => {
+    const newArray = [...array];
+    for (let i = 0; i < newArray.length; i++) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  };
   return (
     <>
       <Header />
