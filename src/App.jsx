@@ -6,8 +6,8 @@ import Header from "./components/header";
 import ScoreBoard from "./components/scoreBoard";
 
 function App() {
-  //const [count, setCount] = useState(0)
-
+  //const [count, setCount] = useState(0);
+  //const [isFlipped,useIsFlipped]=useState('');
   return (
     <>
       <Header />
