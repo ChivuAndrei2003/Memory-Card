@@ -1,7 +1,8 @@
 //import { useState } from "react";
 import "../styles/card.css";
 
-export default function PokemonCard({ pokemon, onCardClick, isFlipped }) {
+export default function PokemonCard({ pokemon,
+  onCardClick, isFlipped }) {
   return (
     <>
       <div

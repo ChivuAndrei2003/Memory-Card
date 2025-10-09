@@ -1,6 +1,5 @@
-//import { useState } from "react";
 import "../styles/header.css";
-import ScoreBoard from "./scoreBoard";
+import ScoreBoard from "./scoreBoard.jsx";
 
 export default function Header({ curretScore, bestScore }) {
   return (
