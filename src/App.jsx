@@ -1,28 +1,27 @@
-//import { useState,useRef,useMemo } from 'react'
+import { useState, useRef, useMemo } from "react";
 import "./App.css";
 import GameBoard from "./components/GameBoard";
 import PokemonCard from "./components/pokemonCard";
 import Header from "./components/header";
 import ScoreBoard from "./components/scoreBoard";
 import { usePokemonData } from "./components/fetchPokemons";
-import { useState } from "react";
+
+import { DifficultySelector } from "./components/difficultySelector";
+import { shuffleArray } from "./components/shuffleArray";
+import GameOver from "./components/gameOver";
 
 function App() {
-  //const [count, setCount] = useState(0);
-  const [isFlipped, setIsFlipped] = useState("");
-  const [pokemon, setPokemon] = useState("");
-  const [onCardClick, setOnCardClick] = useState("");
+  //game states:'difficulty', 'playing', 'gameOver'
+  const [gameState, setGameState] = useState("difficulty");
+  const [difficulty, setDifficulty] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
+  const [clickedPokemons, setClickedPokemons] = useState([]);
+  const [displayedPokemons, setDisplayedPokemons] = useState([]);
+  const [isFlipped, setIsFlipped] = useState(false);
 
-  const shuffleCards = (array) => {
-    const newArray = [...array];
-    for (let i = 0; i < newArray.length; i++) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-  };
+  const { pokemons, isLoading, error } = usePokemonData(difficulty);
+  
   return (
     <>
       <Header />
