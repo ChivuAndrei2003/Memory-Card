@@ -11,7 +11,7 @@ export const DifficultySelector = ({ onSelect }) => {
       <div className="difficulty-buttons">
         {difficulties.map((diff) => (
           <button
-            key={difficulties.level}
+            key={diff.level}
             className={`difficulty-btn ${diff.level}`}
             onClick={() => onSelect(diff.count)}
           >
