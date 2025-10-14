@@ -6,7 +6,7 @@ import { DifficultySelector } from "./components/difficultySelector";
 import { shuffleArray } from "./components/shuffleArray";
 import GameOver from "./components/gameOver";
 import { LoadingScreen } from "./components/loadingScreen";
-import './index.css'
+import "./index.css";
 function App() {
   const [gameState, setGameState] = useState("difficulty");
   const [difficulty, setDifficulty] = useState(0);
@@ -133,8 +133,8 @@ function App() {
   if (gameState === "difficulty") {
     return (
       <div className="app">
-        <div className="start-screen">
-          <h1 className="main-title">Pokemon Memory Game</h1>
+        <div className="text-center ">
+          <h1 className="">Pokemon Memory Game</h1>
           <DifficultySelector onSelect={handleDifficultySelect} />
         </div>
       </div>
