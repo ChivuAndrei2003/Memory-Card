@@ -1,5 +1,3 @@
-import "../styles/card.css";
-
 export default function PokemonCard({ pokemon, onCardClick, isFlipped }) {
   return (
     <>

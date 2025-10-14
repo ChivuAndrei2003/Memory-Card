@@ -1,4 +1,3 @@
-import "../styles/gameOver.css";
 export default function GameOver({ score, bestScore, onRestart }) {
   return (
     <div className="game-over-container">

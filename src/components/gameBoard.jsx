@@ -1,5 +1,4 @@
 import PokemonCard from "./pokemonCard";
-import "../styles/gameBoard.css";
 
 export default function GameBoard({ pokemons, onCardClick, isFlipped }) {
   return (

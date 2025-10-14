@@ -1,4 +1,3 @@
-import "../styles/scoreBoard.css";
 export default function ScoreBoard({ currentScore, bestScore }) {
   return (
     <div className="score-board">

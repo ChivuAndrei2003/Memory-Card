@@ -76,7 +76,7 @@ function App() {
       setDisplayedPokemons((prev) => shuffleArray(prev));
       setIsFlipped(false);
       shuffleTimeoutRef.current = null;
-    }, 600);
+    }, 300);
   };
 
   const handleCardClick = (pokemonId) => {
@@ -122,6 +122,7 @@ function App() {
       </div>
     );
   }
+
   if (gameState === "loading" || (isLoading && gameState !== "difficulty")) {
     return (
       <div className="app">

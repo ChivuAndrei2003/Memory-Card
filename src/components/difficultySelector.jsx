@@ -1,4 +1,3 @@
-import "../styles/difficultySelector.css";
 export const DifficultySelector = ({ onSelect }) => {
   const difficulties = [
     { level: "easy", count: 8, label: "Easy" },
