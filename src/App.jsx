@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import "./App.css";
 import GameBoard from "./components/gameBoard";
 import Header from "./components/header";
 import { usePokemonData } from "./components/fetchPokemons";
@@ -7,7 +6,7 @@ import { DifficultySelector } from "./components/difficultySelector";
 import { shuffleArray } from "./components/shuffleArray";
 import GameOver from "./components/gameOver";
 import { LoadingScreen } from "./components/loadingScreen";
-
+import './index.css'
 function App() {
   const [gameState, setGameState] = useState("difficulty");
   const [difficulty, setDifficulty] = useState(0);

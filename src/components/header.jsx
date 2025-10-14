@@ -2,10 +2,10 @@ import ScoreBoard from "./scoreBoard.jsx";
 
 export default function Header({ currentScore, bestScore }) {
   return (
-    <header>
-      <div className="header-content">
-        <h1 className="title">Pokemon Card Game</h1>
-        <p className="subtitle">Don't click the same pokemon twice</p>
+    <header className="mx-auto mt-2 max-w-2xl flex flex-col  items-center gap-2 bg-slate-600 px-6 py-4 text-white shadow-lg">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold">Pokemon Card Game</h1>
+        <p className="text-sm opacity-90">Don't click the same pokemon twice</p>
       </div>
       <ScoreBoard currentScore={currentScore} bestScore={bestScore} />
     </header>
