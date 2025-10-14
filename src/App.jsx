@@ -1,23 +1,29 @@
-import { useState,  useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
-import GameBoard from "./components/GameBoard";
+import GameBoard from "./components/gameBoard";
 import Header from "./components/header";
 import { usePokemonData } from "./components/fetchPokemons";
 import { DifficultySelector } from "./components/difficultySelector";
 import { shuffleArray } from "./components/shuffleArray";
 import GameOver from "./components/gameOver";
 import { LoadingScreen } from "./components/loadingScreen";
+
 function App() {
-  //game states:'difficulty', 'playing', 'gameOver'
   const [gameState, setGameState] = useState("difficulty");
   const [difficulty, setDifficulty] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
-  const [clickedPokemons, setClickedPokemons] = useState([]);
+  const [_clickedPokemons, setClickedPokemons] = useState([]);
   const [displayedPokemons, setDisplayedPokemons] = useState([]);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [fetchRequestId, setFetchRequestId] = useState(0);
 
-  const { pokemons, isLoading, error } = usePokemonData(difficulty);
+  const shuffleTimeoutRef = useRef(null);
+
+  const { pokemons, isLoading, error } = usePokemonData(
+    difficulty,
+    fetchRequestId
+  );
 
   useEffect(() => {
     if (pokemons.length > 0) {
@@ -26,56 +32,85 @@ function App() {
     }
   }, [pokemons]);
 
+  useEffect(() => {
+    return () => {
+      if (shuffleTimeoutRef.current) {
+        clearTimeout(shuffleTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const clearShuffleTimer = () => {
+    if (shuffleTimeoutRef.current) {
+      clearTimeout(shuffleTimeoutRef.current);
+      shuffleTimeoutRef.current = null;
+    }
+  };
+
+  const resetRoundState = () => {
+    clearShuffleTimer();
+    setCurrentScore(0);
+    setClickedPokemons([]);
+    setIsFlipped(false);
+    setDisplayedPokemons([]);
+  };
+
   const handleDifficultySelect = (count) => {
+    resetRoundState();
     setDifficulty(count);
-    resetGame();
+    setGameState("loading");
+    setFetchRequestId((prev) => prev + 1);
+  };
+
+  const handleRetry = () => {
+    resetRoundState();
+    setGameState("loading");
+    setFetchRequestId((prev) => prev + 1);
+  };
+
+  const shuffleCards = () => {
+    clearShuffleTimer();
+    setIsFlipped(true);
+
+    shuffleTimeoutRef.current = setTimeout(() => {
+      setDisplayedPokemons((prev) => shuffleArray(prev));
+      setIsFlipped(false);
+      shuffleTimeoutRef.current = null;
+    }, 600);
   };
 
   const handleCardClick = (pokemonId) => {
-    if (isFlipped) return; //prevent clicking if it's already flipped
+    if (isFlipped) return;
 
-    if (clickedPokemons.includes(pokemonId)) {
-      if (currentScore > bestScore) {
-        setBestScore(currentScore);
+    setClickedPokemons((prevClicked) => {
+      if (prevClicked.includes(pokemonId)) {
+        setBestScore((prevBest) => Math.max(prevBest, prevClicked.length));
+        setCurrentScore(0);
+        shuffleCards();
+        return [];
       }
-      setGameState("gameOver");
-    } else {
-      //continue game
-      const newScore = currentScore + 1;
-      setCurrentScore(newScore);
-      setClickedPokemons([...clickedPokemons, pokemonId]);
 
-      //verify winning
-      if (newScore === pokemons.length) {
-        setBestScore(newScore);
+      const updatedClicked = [...prevClicked, pokemonId];
+
+      setCurrentScore(updatedClicked.length);
+      setBestScore((prevBest) => Math.max(prevBest, updatedClicked.length));
+
+      if (updatedClicked.length === pokemons.length) {
         setGameState("gameOver");
       } else {
         shuffleCards();
       }
-    }
-  };
 
-  const shuffleCards = () => {
-    setIsFlipped(true);
-    setTimeout(() => {
-      setDisplayedPokemons(shuffleArray(displayedPokemons));
-      setIsFlipped(false);
-    }, 600);
-  };
-
-  const resetGame = () => {
-    setCurrentScore(0);
-    setClickedPokemons([]);
-    setIsFlipped(false);
-    setGameState("difficulty");
+      return updatedClicked;
+    });
   };
 
   const handleRestart = () => {
-    setCurrentScore(0);
-    setClickedPokemons([]);
-    setIsFlipped(false);
-    setDisplayedPokemons(shuffleArray(pokemons));
-    setGameState("playing");
+    resetRoundState();
+    if (pokemons.length > 0) {
+      setDisplayedPokemons(shuffleArray(pokemons));
+      setGameState("playing");
+    }
   };
 
   if (error) {
@@ -83,10 +118,18 @@ function App() {
       <div className="error-screen">
         <h2>Error</h2>
         <p>{error}</p>
-        <button onClick={resetGame}>Try Again</button>
+        <button onClick={handleRetry}>Try Again</button>
       </div>
     );
   }
+  if (gameState === "loading" || (isLoading && gameState !== "difficulty")) {
+    return (
+      <div className="app">
+        <LoadingScreen />
+      </div>
+    );
+  }
+
   if (gameState === "difficulty") {
     return (
       <div className="app">
@@ -98,17 +141,9 @@ function App() {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="app">
-        <LoadingScreen />
-      </div>
-    );
-  }
-
   return (
     <>
-      <Header curretScore={currentScore} bestScore={bestScore} />
+      <Header currentScore={currentScore} bestScore={bestScore} />
 
       <GameBoard
         pokemons={displayedPokemons}

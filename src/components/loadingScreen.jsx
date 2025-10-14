@@ -1,3 +1,4 @@
+import "../styles/loadingScreen.css";
 export const LoadingScreen = () => {
   return (
     <div className="loading-screen">

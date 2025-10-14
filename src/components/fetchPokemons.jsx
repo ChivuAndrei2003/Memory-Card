@@ -1,28 +1,43 @@
 import { useEffect, useState } from "react";
 
-export const usePokemonData = (count) => {
+export const usePokemonData = (count, refreshKey = 0) => {
   const [pokemons, setPokemons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (count <= 0) {
+      setPokemons([]);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    let isCancelled = false;
+
     const fetchPokemons = async () => {
       setIsLoading(true);
       setError(null);
+      setPokemons([]);
 
       try {
-        const randomIds = [];
-        while (randomIds.length < count) {
+        const randomIds = new Set();
+        while (randomIds.size < count) {
           const randomId = Math.floor(Math.random() * 898) + 1;
-          if (!randomIds.includes(randomId)) {
-            randomIds.push(randomId);
-          }
+          randomIds.add(randomId);
         }
 
-        const pokemonPromises = randomIds.map(async (id) => {
+        const pokemonPromises = Array.from(randomIds).map(async (id) => {
           const response = await fetch(
-            `https://pokeapi.co/api/v2/pokemon/${id}`
+            `https://pokeapi.co/api/v2/pokemon/${id}`,
+            { signal: controller.signal }
           );
+
+          if (!response.ok) {
+            throw new Error(`Failed to fetch pokemon with id ${id}`);
+          }
+
           const data = await response.json();
 
           return {
@@ -33,18 +48,34 @@ export const usePokemonData = (count) => {
         });
 
         const pokemonData = await Promise.all(pokemonPromises);
-        setPokemons(pokemonData);
+
+        if (!isCancelled) {
+          setPokemons(pokemonData);
+        }
       } catch (err) {
-        setError("Failed to load pokemon data");
+        if (controller.signal.aborted) {
+          return;
+        }
+
         console.error("Failed to fetch the pokemon : ", err);
+
+        if (!isCancelled) {
+          setError("Failed to load pokemon data");
+        }
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
-    if (count > 0) {
-      fetchPokemons();
-    }
-  }, [count]);
+
+    fetchPokemons();
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
+  }, [count, refreshKey]);
 
   return {
     pokemons,

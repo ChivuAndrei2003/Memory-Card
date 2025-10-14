@@ -9,7 +9,7 @@ export default function PokemonCard({ pokemon, onCardClick, isFlipped }) {
       >
         <div className="card-inner">
           <div className="card-front">
-            <img src={pokemon.image} alt={pokemon.image} loading="lazy" />
+            <img src={pokemon.image} alt={pokemon.name} loading="lazy" />
             <p className="pokemon-name">{pokemon.name}</p>
           </div>
           <div className="card-back">
