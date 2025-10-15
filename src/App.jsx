@@ -7,6 +7,8 @@ import { shuffleArray } from "./components/shuffleArray";
 import GameOver from "./components/gameOver";
 import { LoadingScreen } from "./components/loadingScreen";
 import "./index.css";
+import background from './assets/background.webp';
+
 function App() {
   const [gameState, setGameState] = useState("difficulty");
   const [difficulty, setDifficulty] = useState(0);
@@ -142,7 +144,8 @@ function App() {
   }
 
   return (
-    <>
+    <div className="bg-cover bg-center min-h-screen flex flex-col "
+      style={{ backgroundImage: `url(${background})` }}>
       <Header currentScore={currentScore} bestScore={bestScore} />
 
       <GameBoard
@@ -158,7 +161,7 @@ function App() {
           onRestart={handleRestart}
         />
       )}
-    </>
+    </div>
   );
 }
 

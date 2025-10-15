@@ -1,8 +1,8 @@
 export const DifficultySelector = ({ onSelect }) => {
   const difficulties = [
     { level: "easy", count: 8, label: "Easy" },
-    { level: "medium", count: 12, label: "Medium" },
-    { level: "hard", count: 20, label: "Hard" },
+    { level: "medium", count: 16, label: "Medium" },
+    { level: "hard", count: 24, label: "Hard" },
   ];
 
   const baseButtonClasses =
