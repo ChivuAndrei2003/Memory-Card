@@ -1,20 +1,25 @@
 export default function PokemonCard({ pokemon, onCardClick, isFlipped }) {
   return (
-    <>
-      <div
-        className={`pokemon-card ${isFlipped ? "flipped" : ""}`}
-        onClick={() => onCardClick(pokemon.id)}
-      >
-        <div className=" items-center max-w-2xl mx-auto">
-          <div className="justify-center text-2xl justify-items-center items-center border-2">
-            <img src={pokemon.image} className="block mx-auto items-center justify-center " alt={pokemon.name} loading="lazy" />
-            <p className="text-center">{pokemon.name}</p>
-          </div>
-          <div className="card-back">
-            <div className="pokeball"></div>
-          </div>
+    <button
+      type="button"
+      onClick={() => onCardClick(pokemon.id)}
+      className={`group flex h-full  w-full transition-transform duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 ${
+        isFlipped ? "pointer-events-none opacity-80" : "hover:-translate-y-1"
+      }`}
+    >
+      <div className="flex min-h-[16.5rem] w-full flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white/80 p-6 text-slate-900 shadow-md backdrop-blur">
+        <div className="flex h-35 w-full items-center justify-center">
+          <img
+            src={pokemon.image}
+            alt={pokemon.name}
+            loading="lazy"
+            className="h-28 w-auto object-contain drop-shadow-sm"
+          />
         </div>
+        <p className="text-lg font-semibold capitalize text-slate-800">
+          {pokemon.name}
+        </p>
       </div>
-    </>
+    </button>
   );
 }
