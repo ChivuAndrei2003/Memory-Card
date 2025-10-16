@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import GameBoard from "./components/gameBoard";
 import Header from "./components/header";
 import { usePokemonData } from "./components/fetchPokemons";
@@ -8,6 +8,8 @@ import GameOver from "./components/gameOver";
 import { LoadingScreen } from "./components/loadingScreen";
 import "./index.css";
 import background from "./assets/background.webp";
+
+const FLIP_DURATION = 350;
 
 function App() {
   const [gameState, setGameState] = useState("difficulty");
@@ -19,7 +21,8 @@ function App() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [fetchRequestId, setFetchRequestId] = useState(0);
 
-  const shuffleTimeoutRef = useRef(null);
+  const flipTimeoutsRef = useRef([]);
+  const isInitialDeckRef = useRef(true);
   const backgroundStyle = { backgroundImage: `url(${background})` };
 
   const { pokemons, isLoading, error } = usePokemonData(
@@ -27,34 +30,59 @@ function App() {
     fetchRequestId
   );
 
+  const clearFlipTimers = useCallback(() => {
+    flipTimeoutsRef.current.forEach((timerId) => clearTimeout(timerId));
+    flipTimeoutsRef.current = [];
+  }, []);
+
+  const flipDeck = useCallback(
+    (onHalfFlip) => {
+      clearFlipTimers();
+      setIsFlipped(true);
+
+      const halfwayTimer = setTimeout(() => {
+        onHalfFlip?.();
+      }, FLIP_DURATION);
+
+      const resetTimer = setTimeout(() => {
+        setIsFlipped(false);
+        clearFlipTimers();
+      }, FLIP_DURATION * 2);
+
+      flipTimeoutsRef.current = [halfwayTimer, resetTimer];
+    },
+    [clearFlipTimers]
+  );
+
   useEffect(() => {
-    if (pokemons.length > 0) {
+    if (pokemons.length === 0) return;
+
+    if (isInitialDeckRef.current) {
+      isInitialDeckRef.current = false;
       setDisplayedPokemons(pokemons);
       setGameState("playing");
+      return;
     }
-  }, [pokemons]);
+
+    flipDeck(() => {
+      setDisplayedPokemons(pokemons);
+      setGameState("playing");
+    });
+  }, [pokemons, flipDeck]);
 
   useEffect(() => {
     return () => {
-      if (shuffleTimeoutRef.current) {
-        clearTimeout(shuffleTimeoutRef.current);
-      }
+      clearFlipTimers();
     };
-  }, []);
-
-  const clearShuffleTimer = () => {
-    if (shuffleTimeoutRef.current) {
-      clearTimeout(shuffleTimeoutRef.current);
-      shuffleTimeoutRef.current = null;
-    }
-  };
+  }, [clearFlipTimers]);
 
   const resetRoundState = () => {
-    clearShuffleTimer();
+    clearFlipTimers();
     setCurrentScore(0);
     setClickedPokemons([]);
     setIsFlipped(false);
     setDisplayedPokemons([]);
+    isInitialDeckRef.current = true;
   };
 
   const handleDifficultySelect = (count) => {
@@ -71,14 +99,10 @@ function App() {
   };
 
   const shuffleCards = () => {
-    clearShuffleTimer();
-    setIsFlipped(true);
-
-    shuffleTimeoutRef.current = setTimeout(() => {
+    if (displayedPokemons.length === 0) return;
+    flipDeck(() => {
       setDisplayedPokemons((prev) => shuffleArray(prev));
-      setIsFlipped(false);
-      shuffleTimeoutRef.current = null;
-    }, 300);
+    });
   };
 
   const handleCardClick = (pokemonId) => {
@@ -108,11 +132,15 @@ function App() {
   };
 
   const handleRestart = () => {
-    resetRoundState();
-    if (pokemons.length > 0) {
+    clearFlipTimers();
+    setCurrentScore(0);
+    setClickedPokemons([]);
+    setGameState("playing");
+    if (pokemons.length === 0) return;
+
+    flipDeck(() => {
       setDisplayedPokemons(shuffleArray(pokemons));
-      setGameState("playing");
-    }
+    });
   };
 
   if (error) {
